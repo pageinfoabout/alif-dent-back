@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { resolveServiceDisplay } from '../data/services';
-
+import logoImage from '../assets/logo.png';
 
 const RU_MONTHS = [
   'Январь','Февраль','Март','Апрель','Май','Июнь',
@@ -185,10 +185,10 @@ export default function AdminCalendar() {
     <div className="admin-wrap">
       {notice && <Notice type={notice.type} onClose={() => setNotice(null)}>{notice.message}</Notice>}
       <header className="admin-header">
-        <div className="brand">
-          <div className="brand-mark" />
-          <div className="brand-text">ALIF DENT — Админ-панель</div>
-        </div>
+      <div className="brand">
+  <img src={logoImage} alt="ALIF DENT" className="brand-mark" />
+  <div className="brand-text">ALIF DENT — Админ-панель</div>
+</div>
         <div className="month-nav">
           <button className="btn ghost" onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}>←</button>
           <div className="month-title">{monthLabel}</div>
