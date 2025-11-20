@@ -228,7 +228,6 @@ export default function AdminCalendar() {
                 style={{ position: 'relative' }}
               >
                 <div className="day-date">{dayLabel}</div>
-                // ... more code ...
 
                 <div className="day-top">
                   {count > 0 && <span className="pill">{count}</span>}

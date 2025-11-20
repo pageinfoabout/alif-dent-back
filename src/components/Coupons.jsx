@@ -13,7 +13,7 @@ export default function Coupons({ onBack }) {
     try {
       const { data, error } = await supabase
         .from('cupons')
-        .select('id,cupon_name,discount_percent,created_at')
+        .select('id,cupon_name,discount_percent,created_at,status,deleted_at')
         .order('created_at', { ascending: false });
       if (error) throw error;
       setCoupons(data || []);
@@ -24,7 +24,13 @@ export default function Coupons({ onBack }) {
   async function deleteCoupon(id, name) {
     if (!window.confirm(`Удалить купон "${name}"?`)) return;
     try {
-      const { error } = await supabase.from('cupons').delete().eq('id', id);
+      const { error } = await supabase
+        .from('cupons')
+        .update({ 
+          status: 'deleted',
+          deleted_at: new Date().toISOString()
+        })
+        .eq('id', id);
       if (error) throw error;
       setNotice({ type: 'success', message: `Купон "${name}" удалён` });
       setTimeout(() => setNotice(null), 2500);
@@ -58,8 +64,10 @@ export default function Coupons({ onBack }) {
   const cupon_name = name.trim();
   const discount_percent = Number(discount);
   
-  if (coupons.length >= 1) {
-    setNotice({ type: 'error', message: 'Можно создать только один купон. Сначала удалите существующий.' });
+  // Проверяем только активные (working) купоны
+  const activeCoupons = coupons.filter(c => c.status === 'working');
+  if (activeCoupons.length >= 1) {
+    setNotice({ type: 'error', message: 'Можно создать только один активный купон. Сначала удалите существующий.' });
     setTimeout(() => setNotice(null), 3500);
     return;
   }
@@ -73,8 +81,12 @@ export default function Coupons({ onBack }) {
   try {
     const { data, error } = await supabase
       .from('cupons')
-      .insert({ cupon_name, discount_percent })
-      .select('id,created_at,cupon_name,discount_percent')
+      .insert({ 
+        cupon_name, 
+        discount_percent,
+        status: 'working'
+      })
+      .select('id,created_at,cupon_name,discount_percent,status')
       .single();
     if (error) throw error;
     
@@ -116,15 +128,25 @@ export default function Coupons({ onBack }) {
         <div className="coupons-list">
           <h3>Список купонов</h3>
           {coupons.length === 0 && <div className="empty">Нет купонов</div>}
-          {coupons.map(c => (
-  <div key={c.id} className="coupon-card">
-    <div>
-      <div className="coupon-name">{c.cupon_name}</div>
-      <div className="coupon-discount">{c.discount_percent}%</div>
-    </div>
-    <button className="icon-btn danger" onClick={() => deleteCoupon(c.id, c.cupon_name)} title="Удалить">✕</button>
-  </div>
-))}
+          {coupons.map(c => {
+            const isDeleted = c.status === 'deleted';
+            return (
+              <div key={c.id} className={`coupon-card ${isDeleted ? 'deleted' : ''}`}>
+                <div>
+                  <div className="coupon-name">{c.cupon_name}</div>
+                  <div className="coupon-discount">{c.discount_percent}%</div>
+                  {isDeleted && c.deleted_at && (
+                    <div className="coupon-deleted-date">
+                      Удален: {new Date(c.deleted_at).toLocaleDateString('ru-RU')}
+                    </div>
+                  )}
+                </div>
+                {!isDeleted && (
+                  <button className="icon-btn danger" onClick={() => deleteCoupon(c.id, c.cupon_name)} title="Удалить">✕</button>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

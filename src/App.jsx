@@ -3,6 +3,7 @@ import './App.css';
 import { useState } from 'react';
 import AdminCalendar from './components/AdminCalendar';
 import Coupons from './components/Coupons';
+import Analytics from './components/Analytics';
 import { supabase } from './lib/supabaseClient';
 import { useEffect } from 'react';
 
@@ -106,9 +107,12 @@ async function markAsRead(id) {
         <div className="tabs">
           <button className={`tab ${view === 'calendar' ? 'active' : ''}`} onClick={() => setView('calendar')}>Календарь</button>
           <button className={`tab ${view === 'coupons' ? 'active' : ''}`} onClick={() => setView('coupons')}>Купоны</button>
+          <button className={`tab ${view === 'analytics' ? 'active' : ''}`} onClick={() => setView('analytics')}>Аналитика</button>
         </div>
       </div>
-      {view === 'calendar' ? <AdminCalendar /> : <Coupons onBack={() => setView('calendar')} />}
+      {view === 'calendar' && <AdminCalendar />}
+      {view === 'coupons' && <Coupons onBack={() => setView('calendar')} />}
+      {view === 'analytics' && <Analytics onBack={() => setView('calendar')} />}
       <button className="btn logout-btn" onClick={logout}>Выйти</button>
       
       {showNotifications && (
