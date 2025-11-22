@@ -18,34 +18,37 @@ function rub(n) {
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(n || 0);
 }
 
-export default function DetailedRevenueAnalytics({ period, onClose }) {
+export default function DetailedRevenueAnalytics({ period, selectedMonth, selectedYear, onClose }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [metrics, setMetrics] = useState(null);
 
   useEffect(() => {
     fetchDetailedAnalytics();
-  }, [period]);
+  }, [period, selectedMonth, selectedYear]);
 
   async function fetchDetailedAnalytics() {
     setLoading(true);
     setError(null);
     try {
       const now = new Date();
+      const currentMonth = selectedMonth !== undefined ? selectedMonth : now.getMonth();
+      const currentYear = selectedYear !== undefined ? selectedYear : now.getFullYear();
+      
       const startDate = period === 'month' 
-        ? new Date(now.getFullYear(), now.getMonth(), 1)
-        : new Date(now.getFullYear(), 0, 1);
+        ? new Date(currentYear, currentMonth, 1)
+        : new Date(currentYear, 0, 1);
       const endDate = period === 'month'
-        ? new Date(now.getFullYear(), now.getMonth() + 1, 0)
-        : new Date(now.getFullYear(), 11, 31);
+        ? new Date(currentYear, currentMonth + 1, 0)
+        : new Date(currentYear, 11, 31);
       
       // Previous period for comparison
       const prevStartDate = period === 'month'
-        ? new Date(now.getFullYear(), now.getMonth() - 1, 1)
-        : new Date(now.getFullYear() - 1, 0, 1);
+        ? new Date(currentYear, currentMonth - 1, 1)
+        : new Date(currentYear - 1, 0, 1);
       const prevEndDate = period === 'month'
-        ? new Date(now.getFullYear(), now.getMonth(), 0)
-        : new Date(now.getFullYear() - 1, 11, 31);
+        ? new Date(currentYear, currentMonth, 0)
+        : new Date(currentYear - 1, 11, 31);
 
       const startStr = startDate.toISOString().split('T')[0];
       const endStr = endDate.toISOString().split('T')[0];
@@ -208,9 +211,14 @@ export default function DetailedRevenueAnalytics({ period, onClose }) {
 
       // Previous period revenue
       const prevRevenue = (prevBookings || []).reduce((sum, b) => sum + (b.total || 0), 0);
-      const revenueGrowthRate = prevRevenue > 0 
-        ? ((totalRevenue - prevRevenue) / prevRevenue) * 100 
-        : 0;
+      let revenueGrowthRate = 0;
+      if (prevRevenue > 0) {
+        revenueGrowthRate = ((totalRevenue - prevRevenue) / prevRevenue) * 100;
+      } else if (totalRevenue > 0) {
+        // If previous period had no revenue but current has revenue, show as new growth
+        revenueGrowthRate = 100; // 100% growth (from 0 to current)
+      }
+      // If both are 0, growthRate stays 0
 
       // Process product statistics
       const productList = Object.values(productStats).map(p => ({
@@ -318,8 +326,8 @@ export default function DetailedRevenueAnalytics({ period, onClose }) {
   if (!metrics) return null;
 
   const periodLabel = period === 'month' 
-    ? `${RU_MONTHS[new Date().getMonth()]} ${new Date().getFullYear()}`
-    : `${new Date().getFullYear()}`;
+    ? `${RU_MONTHS[selectedMonth !== undefined ? selectedMonth : new Date().getMonth()]} ${selectedYear !== undefined ? selectedYear : new Date().getFullYear()}`
+    : `${selectedYear !== undefined ? selectedYear : new Date().getFullYear()}`;
 
   // Prepare chart data
   const topProductsChart = metrics.productList.slice(0, 10).map(p => ({

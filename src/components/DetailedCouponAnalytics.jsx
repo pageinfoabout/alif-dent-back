@@ -18,7 +18,7 @@ function rub(n) {
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(n || 0);
 }
 
-export default function DetailedCouponAnalytics({ period, onClose }) {
+export default function DetailedCouponAnalytics({ period, selectedMonth, selectedYear, onClose }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [metrics, setMetrics] = useState(null);
@@ -27,19 +27,22 @@ export default function DetailedCouponAnalytics({ period, onClose }) {
 
   useEffect(() => {
     fetchCouponAnalytics();
-  }, [period, selectedCouponName]);
+  }, [period, selectedCouponName, selectedMonth, selectedYear]);
 
   async function fetchCouponAnalytics() {
     setLoading(true);
     setError(null);
     try {
       const now = new Date();
+      const currentMonth = selectedMonth !== undefined ? selectedMonth : now.getMonth();
+      const currentYear = selectedYear !== undefined ? selectedYear : now.getFullYear();
+      
       const startDate = period === 'month' 
-        ? new Date(now.getFullYear(), now.getMonth(), 1)
-        : new Date(now.getFullYear(), 0, 1);
+        ? new Date(currentYear, currentMonth, 1)
+        : new Date(currentYear, 0, 1);
       const endDate = period === 'month'
-        ? new Date(now.getFullYear(), now.getMonth() + 1, 0)
-        : new Date(now.getFullYear(), 11, 31);
+        ? new Date(currentYear, currentMonth + 1, 0)
+        : new Date(currentYear, 11, 31);
       
       const startStr = startDate.toISOString().split('T')[0];
       const endStr = endDate.toISOString().split('T')[0];
@@ -358,8 +361,8 @@ export default function DetailedCouponAnalytics({ period, onClose }) {
   if (!metrics) return null;
 
   const periodLabel = period === 'month' 
-    ? `${RU_MONTHS[new Date().getMonth()]} ${new Date().getFullYear()}`
-    : `${new Date().getFullYear()}`;
+    ? `${RU_MONTHS[selectedMonth !== undefined ? selectedMonth : new Date().getMonth()]} ${selectedYear !== undefined ? selectedYear : new Date().getFullYear()}`
+    : `${selectedYear !== undefined ? selectedYear : new Date().getFullYear()}`;
 
   // Prepare chart data
   const couponVsNoCouponData = [

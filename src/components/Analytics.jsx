@@ -960,11 +960,21 @@ export default function Analytics({ onBack }) {
       )}
 
       {showRevenueAnalytics && (
-        <DetailedRevenueAnalytics period={period} onClose={() => setShowRevenueAnalytics(false)} />
+        <DetailedRevenueAnalytics 
+          period={period} 
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onClose={() => setShowRevenueAnalytics(false)} 
+        />
       )}
 
       {showCouponAnalytics && (
-        <DetailedCouponAnalytics period={period} onClose={() => setShowCouponAnalytics(false)} />
+        <DetailedCouponAnalytics 
+          period={period} 
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onClose={() => setShowCouponAnalytics(false)} 
+        />
       )}
 
       {showAllClients && stats && (
