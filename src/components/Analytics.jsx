@@ -310,7 +310,7 @@ export default function Analytics({ onBack }) {
       
       const startStr = startDate.toISOString().split('T')[0];
       const endStr = endDate.toISOString().split('T')[0];
-      
+
       // For created_at filtering, use the start of the first day and end of the last day
       const startDateISO = startDate.toISOString();
       // End date should be the end of the last day (23:59:59.999)
@@ -790,7 +790,7 @@ export default function Analytics({ onBack }) {
             </>
           ) : (
             <>
-              <div className="empty">Нет данных</div>
+            <div className="empty">Нет данных</div>
               <div 
                 className="show-more-indicator" 
                 onClick={() => { fetchAllClientsAllTime(); setShowAllClientsAllTime(true); }} 
@@ -911,7 +911,7 @@ export default function Analytics({ onBack }) {
                             onClick={() => fetchRegisteredUserDetails(user)}
                             style={{ cursor: 'pointer' }}
                           >
-                            <div className="registered-user-info">
+                    <div className="registered-user-info">
                               <div className="registered-user-name" style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
                                 {fullName}
                               </div>
@@ -936,16 +936,16 @@ export default function Analytics({ onBack }) {
                                 </div>
                               )}
                               <div className="registered-user-date" style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--line)' }}>
-                                Создан: {new Date(user.created_at).toLocaleDateString('ru-RU', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </div>
-                            </div>
-                          </div>
+                        Создан: {new Date(user.created_at).toLocaleDateString('ru-RU', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  </div>
                         );
                       })}
                     </>
@@ -1025,19 +1025,19 @@ export default function Analytics({ onBack }) {
                       </div>
                     )}
                     {filteredClients.map((client, idx) => (
-                  <div 
-                    key={idx} 
-                    className="client-card clickable-client" 
-                    onClick={() => fetchClientDetails(client.name, client.phone)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="client-info">
-                      <div className="client-name">{client.name}</div>
-                      <div className="client-phone">{client.phone}</div>
-                    </div>
-                    <div className="client-total">{rub(client.total)}</div>
+                <div 
+                  key={idx} 
+                  className="client-card clickable-client" 
+                  onClick={() => fetchClientDetails(client.name, client.phone)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="client-info">
+                    <div className="client-name">{client.name}</div>
+                    <div className="client-phone">{client.phone}</div>
                   </div>
-                    ))}
+                  <div className="client-total">{rub(client.total)}</div>
+                </div>
+              ))}
                   </>
                 );
               })()}
