@@ -1,0 +1,12 @@
+services:
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./client
+      dockerfile: DockerFile
+    ports:
+      - "8080:80"   
+    
+    restart: unless-stopped
+
